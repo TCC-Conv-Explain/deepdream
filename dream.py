@@ -127,7 +127,10 @@ def main():
     image_pil.show()
     
     if args.save_image:
-        image_path = os.path.splitext(args.image)[0] + "_dream.png"
+        if args.image is None:
+            image_path = "random_dream.png"
+        else:
+            image_path = os.path.splitext(args.image)[0] + "_dream.png"
         image_pil.save(image_path)
 
 if __name__ == "__main__":
