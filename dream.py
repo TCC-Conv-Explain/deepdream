@@ -21,7 +21,8 @@ def gradient_ascent_step(
     image: torch.Tensor,
     model: torch.nn.Module,
     hook: Hook,
-    learning_rate: float 
+    learning_rate: float,
+    classification_index=None
     ) -> torch.Tensor:
     
     image = image.to(DEVICE)
@@ -29,6 +30,8 @@ def gradient_ascent_step(
     
     model(image)
     activations = hook.output
+    if classification_index is not None:
+        activations = activations[:, classification_index]
 
     loss = (activations**2).sum()
 
@@ -58,7 +61,8 @@ def deepdream(
         pyramid_levels=4,
         growth_rate=1.8,
         steps=10,
-        learning_rate=9e-2
+        learning_rate=9e-2,
+        classification_index=None
     ) -> torch.Tensor:
     
     normalizer = Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)
@@ -74,7 +78,7 @@ def deepdream(
         image = resizer(image)
 
         for _ in tqdm(range(steps), leave=False):
-            image = gradient_ascent_step(image, model, hook, learning_rate)
+            image = gradient_ascent_step(image, model, hook, learning_rate, classification_index)
         
         image = image.detach()
 
@@ -100,6 +104,7 @@ def main():
     parser.add_argument("--steps", type=int, default=10, help="Number of gradient ascent steps")
     parser.add_argument("--learning-rate", type=float, default=9e-2, help="Learning rate")
     parser.add_argument("--save-image", action='store_true', help="Save image")
+    parser.add_argument("--classification-index", type=int, default=None, help="Classification index")
     
     args = parser.parse_args()
 
@@ -113,6 +118,11 @@ def main():
 
     image.to(DEVICE)
 
+    if args.classification_index is not None:
+        model_layer = model.classifier[6]
+    else:
+        model_layer = model.features[args.layer_index]
+
     image = deepdream(
         image, 
         model, 
@@ -120,7 +130,8 @@ def main():
         args.pyramid_levels, 
         args.growth_rate, 
         args.steps, 
-        args.learning_rate
+        args.learning_rate,
+        classification_index=args.classification_index
         )
 
     image_pil = ToPILImage()(image.squeeze(0))
