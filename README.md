@@ -3,26 +3,6 @@
 A minimal DeepDream implementation in PyTorch, inspired by Google’s original work, using a pretrained VGG16 network.
 This script amplifies internal neural activations via gradient ascent to produce surreal, dream-like images.
 
-## Features
-
-- DeepDream via feature visualization
-
--  Multi-scale image pyramid
-
-Supports:
-
-- Random noise initialization
-
-- User-provided images
-
-- Any intermediate VGG16 feature layer
-
-- Optional class-specific dreaming
-
-- GPU acceleration (CUDA if available)
-
-Simple CLI interface
-
 ## Usage
 #### 1. DeepDream from a random image
 ```shell
@@ -55,6 +35,24 @@ python dream.py --image image.jpg --classification-index 130
 ```
 
 This maximizes the activation of a specific ImageNet class instead of a convolutional layer.
+
+## Features
+
+- DeepDream via feature visualization
+
+-  Multi-scale image pyramid
+
+- Random noise initialization
+
+- User-provided images
+
+- Any intermediate VGG16 feature layer
+
+- Optional class-specific dreaming
+
+- GPU acceleration (CUDA if available)
+
+- Simple CLI interface
 
 ## Key Arguments
 
